@@ -1,7 +1,6 @@
 resource "mongodbatlas_cloud_backup_schedule" "mongodb_backup_schedule" {
-  count = var.mongodbatlas_backup ? 1 : 0
-  project_id   = mongodbatlas_cluster.my-cluster.project_id
-  cluster_name = mongodbatlas_cluster.my-cluster.name
+  project_id   = var.mongodbatlas_project_id
+  cluster_name = var.mongodbatlas_cluster_name
 
   # reference timezone = UTC
   reference_hour_of_day    = 02
@@ -46,7 +45,7 @@ resource "mongodbatlas_cloud_backup_schedule" "mongodb_backup_schedule" {
   auto_export_enabled = true
 
   export {
-    export_bucket_id = mongodbatlas_cloud_backup_snapshot_export_bucket.mongodb-snapshots-bucket[0].export_bucket_id
+    export_bucket_id = mongodbatlas_cloud_backup_snapshot_export_bucket.mongodb-snapshots-bucket.export_bucket_id
     frequency_type = var.mongodbatlas_backup_export_frequency_type
   }
 

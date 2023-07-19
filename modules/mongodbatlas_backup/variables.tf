@@ -1,19 +1,11 @@
 variable "mongodbatlas_project_id" {
   type        = string
   description = "MongoDBAtlas project ID"
-  default     = "YOUR-PROJECT-ID"
 }
 
-variable mongodbatlas_cluster_name {
+variable "mongodbatlas_cluster_name" {
   type        = string
   description = "MongoDBAtlas cluster name"
-  default     = "YOUR-PROJECT-NAME"
-}
-
-variable "mongodbatlas_db_instance_size_name" {
-  type        = string
-  description = "MongoDB provider instance size name."
-  default     = "M10"
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

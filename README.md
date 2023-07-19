@@ -22,17 +22,17 @@ This will enable the cloud backup on atlas with the default policy settings (fre
 At this point, we need to create the S3 bucket that will be used for exporting the snapshots,
 this is optional, but it's another measure in order to react to a failure on atlas, avoiding data loss.
 
+We can wrap all the following resources in a module, so we can use `count` to optionally create the backup set-up
+depending on the value of the flag `mongodbatlas_backup`,
+this allows you to use the same template for different environment
+(e.g., we are setting `mongodbatlas_backup`: `true` for production and `false` for development deployments).
+.
+
 ```terraform
 resource "aws_s3_bucket" "mongodb_snapshots_bucket" {
-  count = var.mongodbatlas_backup ? 1 : 0
   bucket = "mongodb-snapshots"
 }
 ```
-
-`count` is used to optionally create the bucket depending on the value of the flag `mongodbatlas_backup`.
-This is used for creating all the resources in this tutorial
-and allows you to use the same template for different environment
-(e.g., we are setting `mongodbatlas_backup`: `true` for production and `false` for development deployments).
 
 Atlas needs to be allowed to write files in the bucket we've just created,
 let's create a policy that grants permissions for writing objects in the bucket
@@ -40,9 +40,8 @@ and a role that will be assumed by Atlas during the export job.
 
 ```terraform
 resource "aws_iam_role_policy" "mongodbatlas_policy" {
-  count = var.mongodbatlas_backup ? 1 : 0
   name = "mongo_setup_policy"
-  role = aws_iam_role.mongodbatlas_role[0].id
+  role = aws_iam_role.mongodbatlas_role.id
 
   policy = <<-EOF
   {
@@ -51,12 +50,12 @@ resource "aws_iam_role_policy" "mongodbatlas_policy" {
       {
         "Effect": "Allow",
         "Action": "s3:GetBucketLocation",
-        "Resource": "${aws_s3_bucket.mongodb_snapshots_bucket[0].arn}"
+        "Resource": "${aws_s3_bucket.mongodb_snapshots_bucket.arn}"
       },
       {
         "Effect": "Allow",
         "Action": "s3:PutObject",
-        "Resource": "${aws_s3_bucket.mongodb_snapshots_bucket[0].arn}/*"
+        "Resource": "${aws_s3_bucket.mongodb_snapshots_bucket.arn}/*"
       }
     ]
   }
@@ -64,7 +63,6 @@ resource "aws_iam_role_policy" "mongodbatlas_policy" {
 }
 
 resource "aws_iam_role" "mongodbatlas_role" {
-  count = var.mongodbatlas_backup ? 1 : 0
   name = "mongo_setup_role"
 
   assume_role_policy = <<EOF
@@ -74,12 +72,12 @@ resource "aws_iam_role" "mongodbatlas_role" {
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "${mongodbatlas_cloud_provider_access_setup.setup_only[0].aws.atlas_aws_account_arn}"
+        "AWS": "${mongodbatlas_cloud_provider_access_setup.setup_only.aws.atlas_aws_account_arn}"
       },
       "Action": "sts:AssumeRole",
       "Condition": {
         "StringEquals": {
-          "sts:ExternalId": "${mongodbatlas_cloud_provider_access_setup.setup_only[0].aws.atlas_assumed_role_external_id}"
+          "sts:ExternalId": "${mongodbatlas_cloud_provider_access_setup.setup_only.aws.atlas_assumed_role_external_id}"
         }
       }
     }
@@ -99,18 +97,16 @@ Note that we have used values of `mongodbatlas_cloud_provider_access_setup` for 
 
 ```terraform
 resource "mongodbatlas_cloud_provider_access_setup" "setup_only" {
-  count = var.mongodbatlas_backup ? 1 : 0
   project_id = var.mongodbatlas_project_id
   provider_name = "AWS"
 }
 
 resource "mongodbatlas_cloud_provider_access_authorization" "auth_role" {
-  count = var.mongodbatlas_backup ? 1 : 0
   project_id = var.mongodbatlas_project_id
-  role_id    = mongodbatlas_cloud_provider_access_setup.setup_only[0].role_id
+  role_id    = mongodbatlas_cloud_provider_access_setup.setup_only.role_id
 
   aws {
-    iam_assumed_role_arn = aws_iam_role.mongodbatlas_role[0].arn
+    iam_assumed_role_arn = aws_iam_role.mongodbatlas_role.arn
   }
 }
 ```
@@ -122,26 +118,24 @@ we need to specify the dependency with `depends_on` argument.
 
 ```terraform
 resource "mongodbatlas_cloud_backup_snapshot_export_bucket" "mongodb-snapshots-bucket" {
-  count = var.mongodbatlas_backup ? 1 : 0
   project_id      = var.mongodbatlas_project_id
-  iam_role_id     = mongodbatlas_cloud_provider_access_setup.setup_only[0].role_id
-  bucket_name     = aws_s3_bucket.mongodb_snapshots_bucket[0].id
+  iam_role_id     = mongodbatlas_cloud_provider_access_setup.setup_only.role_id
+  bucket_name     = aws_s3_bucket.mongodb_snapshots_bucket.id
   cloud_provider  = "AWS"
 
   depends_on = [
-    mongodbatlas_cloud_provider_access_authorization.auth_role[0]
+    mongodbatlas_cloud_provider_access_authorization.auth_role
   ]
 }
 ```
 
 The set-up is now complete, we only need to specify a schedule policy with auto_export enabled.
 
-In the following code we use `dynamic` for creating a dynamic numbers of block `policy_item_XXX`
+In the following code we use `dynamic` for creating a dynamic number of blocks `policy_item_XXX`
 (0 to n, depending on the number of policies we specify in the variables)
 
 ```terraform
 resource "mongodbatlas_cloud_backup_schedule" "mongodb_backup_schedule" {
-  count = var.mongodbatlas_backup ? 1 : 0
   project_id   = mongodbatlas_cluster.my-cluster.project_id
   cluster_name = mongodbatlas_cluster.my-cluster.name
 
@@ -184,7 +178,7 @@ resource "mongodbatlas_cloud_backup_schedule" "mongodb_backup_schedule" {
   auto_export_enabled = true
 
   export {
-    export_bucket_id = mongodbatlas_cloud_backup_snapshot_export_bucket.mongodb-snapshots-bucket[0].export_bucket_id
+    export_bucket_id = mongodbatlas_cloud_backup_snapshot_export_bucket.mongodb-snapshots-bucket.export_bucket_id
     frequency_type = var.mongodbatlas_backup_export_frequency_type
   }
 

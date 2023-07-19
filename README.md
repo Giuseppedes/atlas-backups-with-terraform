@@ -1,4 +1,4 @@
-# atlas-backups-with-terraform
+# mongodb-atlas-backups-with-terraform
 Terraform code for setting up backups on Atlas MongoDB
 
 ## Disaster recovery: How to enable automatic backups of an Atlas MongoDB cluster using Terraform and storing snapshots on AWS S3.

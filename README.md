@@ -8,8 +8,12 @@ the first step for enabling backups is to set the argument `cloud_backup` in the
 
 ```terraform
 resource "mongodbatlas_cluster" "my-cluster" {
-  ...
-  cloud_backup = var.mongodbatlas_backup
+  project_id   = var.mongodbatlas_project_id
+  name         = var.mongodbatlas_project_name
+  provider_instance_size_name =  var.provider_instance_size_name # At least "M10"
+  provider_name               = "AWS"
+  
+  cloud_backup                = var.mongodbatlas_backup
 }
 ```
 

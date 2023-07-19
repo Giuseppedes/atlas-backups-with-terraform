@@ -253,6 +253,8 @@ variable "mongodbatlas_backup_policy_item_monthly_list" {
 }
 ```
 
+## Examples
+
 ### Production variables
 Backup enabled, snapshots every 6 hours, every day,
 every Monday and Saturday, every last day of the month,

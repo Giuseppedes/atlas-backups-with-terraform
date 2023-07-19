@@ -1,5 +1,5 @@
 module "mongodbatlas" {
-  source = "../modules/mongodbatlas"
+  source = "../../modules/mongodbatlas"
 
   mongodbatlas_backup                          = var.mongodbatlas_backup
   mongodbatlas_backup_export_frequency_type    = var.mongodbatlas_backup_export_frequency_type

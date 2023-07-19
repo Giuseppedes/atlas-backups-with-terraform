@@ -22,7 +22,7 @@ variable "mongodbatlas_db_instance_size_name" {
 
 variable "mongodbatlas_backup" {
   type        = bool
-  description = "Is MongoDBAtlas Backup enable?"
+  description = "Is MongoDBAtlas Backup enabled?"
   default     = false
 }
 

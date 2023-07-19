@@ -14,7 +14,7 @@ variable "mongodbatlas_cluster_name" {
 
 variable "mongodbatlas_backup" {
   type        = bool
-  description = "Is MongoDBAtlas Backup enable?"
+  description = "Is MongoDBAtlas Backup enabled?"
   default     = false
 }
 

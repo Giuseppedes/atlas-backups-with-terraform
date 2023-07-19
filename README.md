@@ -26,7 +26,6 @@ We can wrap all the following resources in a module, so we can use `count` to op
 depending on the value of the flag `mongodbatlas_backup`,
 this allows you to use the same template for different environment
 (e.g., we are setting `mongodbatlas_backup`: `true` for production and `false` for development deployments).
-.
 
 ```terraform
 resource "aws_s3_bucket" "mongodb_snapshots_bucket" {

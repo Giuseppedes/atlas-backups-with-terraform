@@ -249,6 +249,11 @@ variable "mongodbatlas_backup_policy_item_monthly_list" {
 }
 ```
 
+### Production variables
+Backup enabled, snapshots every 6 hours, every day,
+every Monday and Saturday, every last day of the month,
+weekly exports on S3.
+
 `production.tfvars`
 ```terraform
 mongodbatlas_backup = true
@@ -288,6 +293,9 @@ mongodbatlas_backup_policy_item_monthly = [
 ]
 ```
 
+### Staging variables
+Backup enabled, snapshots every last day of the month, monthly exports.
+
 `staging.tfvars`
 ```terraform
 mongodbatlas_backup = true
@@ -300,6 +308,9 @@ mongodbatlas_backup_policy_item_monthly = [
   }
 ]
 ```
+
+### Development variables
+Backup disabled.
 
 `development.tfvars`
 ```terraform

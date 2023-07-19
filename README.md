@@ -3,7 +3,7 @@ Terraform code for setting up backups on Atlas MongoDB
 
 ## Disaster recovery: How to enable automatic backups of an Atlas MongoDB cluster using Terraform and storing snapshots on AWS S3.
 
-Assuming we have a terraform module for defining Mongo Atlas cluster,
+Assuming we have a terraform module for defining the Mongo Atlas cluster,
 the first step for enabling backups is to set the argument `cloud_backup` in the resource `mongodbatlas_cluster`.
 
 ```terraform
@@ -17,12 +17,13 @@ resource "mongodbatlas_cluster" "my-cluster" {
 }
 ```
 
-This will enable the cloud backup on atlas with the default policy settings (frequency and retention), we will update it later.
+This will enable the cloud backup on Atlas with the default policy settings (frequency and retention),
+we will update it later.
 
 At this point, we need to create the S3 bucket that will be used for exporting the snapshots,
-this is optional, but it's another measure in order to react to a failure on atlas, avoiding data loss.
+this is optional, but it's another measure to react to a failure on Atlas, avoiding data loss.
 
-We can wrap all the following resources in a module, so we can use `count` to optionally create the backup set-up
+We can wrap all the following resources in a module, so we can use `count` to optionally create the backup setup
 depending on the value of the flag `mongodbatlas_backup`,
 this allows you to use the same template for different environment
 (e.g., we are setting `mongodbatlas_backup`: `true` for production and `false` for development deployments).
@@ -87,7 +88,7 @@ EOF
 ```
 
 This will create all the resources on AWS side, but we need to connect them with Atlas,
-for this we have to use two resources: 
+for this, we have to use two resources: 
 `mongodbatlas_cloud_provider_access_setup` and `mongodbatlas_cloud_provider_access_authorization`.
 
 The former allows you to register AWS IAM roles in Atlas, the latter allows you to authorize them.
@@ -128,9 +129,9 @@ resource "mongodbatlas_cloud_backup_snapshot_export_bucket" "mongodb-snapshots-b
 }
 ```
 
-The set-up is now complete, we only need to specify a schedule policy with auto_export enabled.
+The setup is now complete, we only need to specify a schedule policy with auto_export enabled.
 
-In the following code we use `dynamic` for creating a dynamic number of blocks `policy_item_XXX`
+In the following code, we use `dynamic` for creating a dynamic number of blocks `policy_item_XXX`
 (0 to n, depending on the number of policies we specify in the variables)
 
 ```terraform
@@ -249,8 +250,8 @@ variable "mongodbatlas_backup_policy_item_monthly_list" {
 ## Examples
 
 ### Production variables
-Backup enabled, snapshots every 6 hours, every day,
-every Monday and Saturday, every last day of the month,
+Backup enabled; snapshots every 6 hours, every day,
+every Monday and Saturday, every last day of the month;
 weekly exports on S3.
 
 `production.tfvars`
@@ -293,7 +294,7 @@ mongodbatlas_backup_policy_item_monthly_list = [
 ```
 
 ### Staging variables
-Backup enabled, snapshots every last day of the month, monthly exports.
+Backup enabled; snapshots every last day of the month; monthly exports on S3.
 
 `staging.tfvars`
 ```terraform

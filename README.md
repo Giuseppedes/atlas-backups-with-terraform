@@ -25,7 +25,7 @@ this is optional, but it's another measure to react to a failure on Atlas, avoid
 
 We can wrap all the following resources in a module, so we can use `count` to optionally create the backup setup
 depending on the value of the flag `mongodbatlas_backup`,
-this allows you to use the same template for different environment
+this allows you to use the same template for different environments
 (e.g., we are setting `mongodbatlas_backup`: `true` for production and `false` for development deployments).
 
 ```terraform
